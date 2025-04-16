@@ -129,11 +129,8 @@ try {
             log_message("  Тест: {$quiz->name} (ID: {$quiz->id})", $options['verbose']);
 
             if (!quiz_has_essay_questions($quiz->id)) {
-                log_message("    Нет вопросов типа 'эссе'", $options['verbose']);
                 continue;
             }
-
-            log_message("    Найдены вопросы типа 'эссе'", $options['verbose']);
 
             // Получаем пользователей с попытками (упорядочиваем по attempt ASC - от старых к новым).
             $attempts = $DB->get_records_select(
@@ -155,7 +152,6 @@ try {
                 }
 
                 if (count($userattempts) < 2) {
-                    log_message("    У пользователя ID {$userid} меньше 2 попыток", $options['verbose']);
                     continue;
                 }
 
@@ -174,8 +170,6 @@ try {
                     if ($count > 0) {
                         $processedusers++;
                         log_message("      Успешно перенесено оценок: {$count}", $options['verbose']);
-                    } else {
-                        log_message("      Нет оценок для переноса", $options['verbose']);
                     }
                 } catch (Exception $e) {
                     log_message("      Ошибка: " . $e->getMessage(), true);

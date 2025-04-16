@@ -24,13 +24,26 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($ADMIN->fulltree) {
+if ($hassiteconfig) {
+
+    $settings = new admin_settingpage('local_quizessaygrader', get_string('pluginname',
+    'local_quizessaygrader'));
+    $ADMIN->add('localplugins', $settings);
+
+    $settings->add(new admin_setting_heading(
+        'local_quizessaygrader',
+        '',
+        get_string('pluginname_help', 'local_quizessaygrader'),
+    ));
+
     $plugininfo = \core_plugin_manager::instance()->get_plugin_info('local_quizessaygrader');
     $donate = get_string('donate', 'local_quizessaygrader', $plugininfo);
 
     $settings->add(new admin_setting_heading(
-        'local_quizessaygrader_settings',
-        get_string('pluginname_help', 'local_quizessaygrader'),
+        'local_quizessaygrader_donate',
+        ' ',
         $donate,
     ));
+
+
 }

@@ -14,18 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_quizessaygrader\task;
+
 /**
- * Version details
+ * Send expiry notifications task.
  *
- * @package     local_quizessaygrader
- * @copyright   2025 Alex Orlov <snickser@gmail.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   local_quizessaygrader
+ * @copyright 2025 Alex Orlov <snickser@gmail.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+class quizessaygrader extends \core\task\scheduled_task {
+    /**
+     * Name for this task.
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('pluginname', 'local_quizessaygrader');
+    }
 
-$plugin->version   = 2025041612;      // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2023100400;      // Requires this Moodle version.
-$plugin->component = 'local_quizessaygrader'; // Full name of the plugin (used for diagnostics).
-$plugin->release   = '0.1';
-$plugin->maturity  = MATURITY_STABLE;
+    /**
+     * Run task for autocommits.
+     */
+    public function execute() {
+        global $DB, $CFG;
+
+        mtrace('start');
+
+        mtrace('end.');
+    }
+}

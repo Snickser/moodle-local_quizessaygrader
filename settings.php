@@ -25,9 +25,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-
-    $settings = new admin_settingpage('local_quizessaygrader', get_string('pluginname',
-    'local_quizessaygrader'));
+    $settings = new admin_settingpage('local_quizessaygrader', get_string(
+        'pluginname',
+        'local_quizessaygrader'
+    ));
     $ADMIN->add('localplugins', $settings);
 
     $settings->add(new admin_setting_heading(
@@ -44,6 +45,4 @@ if ($hassiteconfig) {
         ' ',
         $donate,
     ));
-
-
 }

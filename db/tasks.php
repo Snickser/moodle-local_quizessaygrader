@@ -15,17 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
- *
- * @package     local_quizessaygrader
- * @copyright   2025 Alex Orlov <snickser@gmail.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Task definition for local_quizessaygrader.
+ * @package   local_quizessaygrader
+ * @copyright 2024 Alex Orlov <snickser@gmail.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025041612;      // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2023100400;      // Requires this Moodle version.
-$plugin->component = 'local_quizessaygrader'; // Full name of the plugin (used for diagnostics).
-$plugin->release   = '0.1';
-$plugin->maturity  = MATURITY_STABLE;
+$tasks = [
+    [
+        'classname' => 'local_quizessaygrader\\task\\quizessaygrader',
+        'blocking' => 0,
+        'minute' => '*/5',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0,
+    ],
+];

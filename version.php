@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025041612;      // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2025041613;      // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2023100400;      // Requires this Moodle version.
 $plugin->component = 'local_quizessaygrader'; // Full name of the plugin (used for diagnostics).
-$plugin->release   = '0.1';
+$plugin->release   = '0.2';
 $plugin->maturity  = MATURITY_STABLE;

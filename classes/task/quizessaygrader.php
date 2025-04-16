@@ -40,6 +40,11 @@ class quizessaygrader extends \core\task\scheduled_task {
     public function execute() {
         global $DB, $CFG;
 
+        // Unfortunately this may take a long time, it should not be interrupted,
+        // otherwise users get duplicate notification.
+        \core_php_time_limit::raise();
+        \raise_memory_limit(MEMORY_HUGE);
+
         mtrace('start');
 
         mtrace('end.');

@@ -27,7 +27,7 @@ $tasks = [
     [
         'classname' => 'local_quizessaygrader\\task\\quizessaygrader',
         'blocking' => 0,
-        'minute' => '*/10',
+        'minute' => '*/5',
         'hour' => '*',
         'day' => '*',
         'month' => '*',

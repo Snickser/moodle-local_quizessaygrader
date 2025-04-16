@@ -94,6 +94,9 @@ function quiz_has_essay_questions($quizid) {
 }
 
 try {
+
+    $gradetype = get_config('local_quizessaygrader', 'gradetype');
+
     $transaction = $DB->start_delegated_transaction();
     $starttime = time();
     $processedusers = 0;
@@ -148,15 +151,15 @@ try {
             }
 
             foreach ($usersattempts as $userid => $userattempts) {
+                if (!is_enrolled(context_course::instance($course->id), $userid)) {
+                    continue;
+                }
+
                 if ($options['maxusers'] > 0 && $processedusers >= $options['maxusers']) {
                     break 3;
                 }
 
                 if (count($userattempts) < 2) {
-                    continue;
-                }
-
-                if (!is_enrolled(context_course::instance($course->id), $userid)) {
                     continue;
                 }
 
@@ -171,7 +174,7 @@ try {
                 log_message("      Перенос оценок из попытки #{$prevattempt->attempt} в попытку #{$lastattempt->attempt}", $options['verbose']);
 
                 try {
-                    $count = transfer_essay_grades($prevattempt->id, $lastattempt->id, $options['verbose'], $options['dryrun']);
+                    $count = transfer_essay_grades($prevattempt->id, $lastattempt->id, $options['verbose'], $options['dryrun'], $gradetype);
                     if ($count > 0) {
                         $processedusers++;
                         log_message("      Успешно перенесено оценок: {$count}", $options['verbose']);
@@ -202,7 +205,7 @@ try {
     exit(1);
 }
 
-function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = false, $dryrun = false) {
+function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = false, $dryrun = false, $gradetype = 0) {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/mod/quiz/locallib.php');
     require_once($CFG->libdir . '/gradelib.php');
@@ -243,7 +246,11 @@ function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = fa
                     $targetgrade = $targetqa->get_fraction();
 
                     // Условия пропуска
-                    if (is_null($grade) || $actualgrade <= 0 || $actualgrade < $maxmark) {
+                    $maxgrade = $maxmark;
+                    if ($gradetype) {
+                	$maxgrade = $actualgrade;
+                    }
+                    if (is_null($grade) || $actualgrade <= 0 || $actualgrade < $maxgrade) {
                         log_message("        Эссе (слот {$slot->slot}): оценка $actualgrade (не переносится)", $verbose);
                         continue;
                     }

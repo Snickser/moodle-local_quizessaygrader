@@ -36,10 +36,5 @@ width="330" height="50" frameborder="0" allowtransparency="true" scrolling="no">
 $string['pluginname'] = 'Quiz Essay Grader Tool';
 $string['pluginname_help'] = 'A plugin that makes teachers jobs easier automatically carries over students successful essay grades to assignments from the previous attempt.';
 $string['transferessaygrades'] = 'Transfer Essay Grades';
-$string['sourceattempt'] = 'Source Attempt ID';
-$string['targetattempt'] = 'Target Attempt ID';
-$string['transfergrades'] = 'Transfer Grades';
-$string['attemptnotfound'] = 'Attempt not found';
-$string['transfercomplete'] = 'Successfully transferred {$a} essay grades';
-$string['sourceattempt_help'] = 'Enter the ID of the attempt to copy grades from';
-$string['targetattempt_help'] = 'Enter the ID of the attempt to copy grades to';
+$string['gradetype'] = 'Grade type';
+$string['gradetype_desc'] = 'Specifies which grade to copy, only the maximum grade or any grade greater than zero.';

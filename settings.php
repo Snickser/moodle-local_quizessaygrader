@@ -31,18 +31,31 @@ if ($hassiteconfig) {
     ));
     $ADMIN->add('localplugins', $settings);
 
-    $settings->add(new admin_setting_heading(
-        'local_quizessaygrader',
-        '',
-        get_string('pluginname_help', 'local_quizessaygrader'),
-    ));
 
     $plugininfo = \core_plugin_manager::instance()->get_plugin_info('local_quizessaygrader');
     $donate = get_string('donate', 'local_quizessaygrader', $plugininfo);
 
     $settings->add(new admin_setting_heading(
         'local_quizessaygrader_donate',
-        ' ',
+        '',
         $donate,
     ));
+
+    $settings->add(new admin_setting_heading(
+        'local_quizessaygrader',
+        ' ',
+        get_string('pluginname_help', 'local_quizessaygrader'),
+    ));
+
+    $options = [0 => get_string('highgradeletter', 'grades'),
+                1 => get_string('real', 'grades'),
+    ];
+    $settings->add(new admin_setting_configselect(
+        'local_quizessaygrader/gradetype',
+        get_string('gradetype', 'local_quizessaygrader'),
+        get_string('gradetype_desc', 'local_quizessaygrader'),
+        0,
+        $options
+    ));
+
 }

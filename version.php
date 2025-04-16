@@ -18,7 +18,7 @@
  * Version details
  *
  * @package     local_quizessaygrader
- * @copyright   2024 Alex Orlov <snickser@gmail.com>
+ * @copyright   2025 Alex Orlov <snickser@gmail.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

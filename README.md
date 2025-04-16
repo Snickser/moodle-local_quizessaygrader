@@ -1,1 +1,1 @@
-# moodle-local_essaygrader
+# moodle-local_quizessaygrader

@@ -20,6 +20,7 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->libdir . '/clilib.php');
 
+require_once($CFG->dirroot . '/lib/enrollib.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/lib/gradelib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
@@ -152,6 +153,10 @@ try {
                 }
 
                 if (count($userattempts) < 2) {
+                    continue;
+                }
+
+                if (!is_enrolled(context_course::instance($course->id), $userid)) {
                     continue;
                 }
 

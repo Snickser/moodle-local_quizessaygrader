@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+
 if ($hassiteconfig) {
     $settings = new admin_settingpage('local_quizessaygrader', get_string(
         'pluginname',
@@ -73,3 +74,4 @@ if ($hassiteconfig) {
     ));
 
 }
+

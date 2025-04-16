@@ -293,7 +293,6 @@ function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = fa
 
             // Пересчитываем суммарную оценку и обновляем попытку.
             $targetattempt->sumgrades = $targetquba->get_total_mark();
-            $targetattempt->state = 'finished';
             $targetattempt->timefinish = time();
             $DB->update_record('quiz_attempts', $targetattempt);
         }

@@ -58,4 +58,18 @@ if ($hassiteconfig) {
         $options
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'local_quizessaygrader/dryrun',
+        get_string('dryrun', 'local_quizessaygrader'),
+        '',
+        1
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_quizessaygrader/verbose',
+        get_string('verbose', 'local_quizessaygrader'),
+        '',
+        1
+    ));
+
 }

@@ -38,3 +38,5 @@ $string['pluginname_help'] = 'A plugin that makes teachers jobs easier automatic
 $string['transferessaygrades'] = 'Transfer Essay Grades';
 $string['gradetype'] = 'Grade type';
 $string['gradetype_desc'] = 'Specifies which grade to copy, only the maximum grade or any grade greater than zero.';
+$string['dryrun'] = 'Test mode';
+$string['verbose'] = 'Verbose output';

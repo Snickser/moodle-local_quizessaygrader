@@ -16,7 +16,7 @@
 // Genarated by DeepSeek.
 
 define('CLI_SCRIPT', true);
-require_once(__DIR__ . '/../../config.php');
+require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->libdir . '/clilib.php');
 
@@ -26,12 +26,12 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
 require_once($CFG->dirroot . '/mod/quiz/classes/grade_calculator.php');
 use mod_quiz\quiz_settings;
 
-// Настройки обработки ошибок
+// Настройки обработки ошибок.
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 
-// Обработка параметров командной строки
+// Обработка параметров командной строки.
 [$options, $unrecognized] = cli_get_params([
     'help' => false,
     'courseid' => 0,
@@ -100,7 +100,7 @@ try {
     log_message("Начало обработки в " . date('Y-m-d H:i:s') .
                ($options['dryrun'] ? " (ТЕСТОВЫЙ РЕЖИМ)" : ""), true);
 
-    // Получаем список курсов
+    // Получаем список курсов.
     $courses = $DB->get_records_select(
         'course',
         $options['courseid'] > 0 ? 'id = ?' : '1=1',
@@ -114,7 +114,7 @@ try {
 
         log_message("\nКурс: " . format_string($course->fullname) . " (ID: {$course->id})", true);
 
-        // Получаем quiz в курсе
+        // Получаем quiz в курсе.
         $quizzes = $DB->get_records_select(
             'quiz',
             $options['quizid'] > 0 ? 'course = ? AND id = ?' : 'course = ?',
@@ -135,15 +135,15 @@ try {
 
             log_message("    Найдены вопросы типа 'эссе'", $options['verbose']);
 
-            // Получаем пользователей с попытками (упорядочиваем по attempt ASC - от старых к новым)
+            // Получаем пользователей с попытками (упорядочиваем по attempt ASC - от старых к новым).
             $attempts = $DB->get_records_select(
                 'quiz_attempts',
                 $options['userid'] > 0 ? 'quiz = ? AND state = ? AND userid = ?' : 'quiz = ? AND state = ?',
                 $options['userid'] > 0 ? [$quiz->id, 'finished', $options['userid']] : [$quiz->id, 'finished'],
-                'userid, attempt ASC' // Сортируем по возрастанию номера попытки
+                'userid, attempt ASC' // Сортируем по возрастанию номера попытки.
             );
 
-            // Группируем попытки по пользователям (теперь первая попытка - самая ранняя)
+            // Группируем попытки по пользователям (теперь первая попытка - самая ранняя).
             $usersattempts = [];
             foreach ($attempts as $attempt) {
                 $usersattempts[$attempt->userid][] = $attempt;
@@ -162,16 +162,10 @@ try {
                 $user = $DB->get_record('user', ['id' => $userid], 'id, firstname, lastname');
                 log_message("    Пользователь: {$user->firstname} {$user->lastname} (ID: {$user->id})", $options['verbose']);
 
-                // Теперь:
-                // $user_attempts[0] - самая ранняя попытка (первая)
-                // $user_attempts[1] - следующая попытка
-                // ...
-                // end($user_attempts) - самая последняя попытка
-
-                // Берем две последние попытки
-                $lastattempt = end($userattempts); // Самая новая попытка
+                // Берем две последние попытки.
+                $lastattempt = end($userattempts); // Самая новая попытка.
                 prev($userattempts);
-                $prevattempt = current($userattempts); // Предыдущая попытка
+                $prevattempt = current($userattempts); // Предыдущая попытка.
 
                 log_message("      Перенос оценок из попытки #{$prevattempt->attempt} в попытку #{$lastattempt->attempt}", $options['verbose']);
 
@@ -191,7 +185,7 @@ try {
         }
     }
 
-    // Фиксируем изменения
+    // Фиксируем изменения.
     if (!$options['dryrun']) {
         $transaction->allow_commit();
         log_message("Изменения сохранены в базе данных", true);
@@ -209,36 +203,27 @@ try {
     exit(1);
 }
 
-/**
- * Переносит оценки за эссе между попытками с проверками:
- * - только оценки > 0
- * - только если в целевой попытке еще нет оценки
- * - с корректной обработкой шагов вопросов
- * @package local_quizessaygrader
- */
 function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = false, $dryrun = false) {
     global $DB, $CFG;
+    require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+    require_once($CFG->libdir . '/gradelib.php');
 
     try {
-        // Получаем данные о попытках
+        // Получаем данные о попытках.
         $sourceattempt = $DB->get_record('quiz_attempts', ['id' => $sourceattemptid], '*', MUST_EXIST);
         $targetattempt = $DB->get_record('quiz_attempts', ['id' => $targetattemptid], '*', MUST_EXIST);
         $quiz = $DB->get_record('quiz', ['id' => $targetattempt->quiz], '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('quiz', $quiz->id, $quiz->course, false, MUST_EXIST);
 
-        // Загружаем usage для попыток
+        // Загружаем usage для попыток.
         $sourcequba = question_engine::load_questions_usage_by_activity($sourceattempt->uniqueid);
         $targetquba = question_engine::load_questions_usage_by_activity($targetattempt->uniqueid);
-
-        // Загружаем все шаги пользователей для обеих попыток
-        $sourcequba->preload_all_step_users();
-        $targetquba->preload_all_step_users();
 
         $count = 0;
         $totalessays = 0;
         $skippedalreadygraded = 0;
 
-        // Получаем слоты вопросов
+        // Получаем слоты вопросов.
         $slots = $DB->get_records('quiz_slots', ['quizid' => $quiz->id], 'slot');
 
         foreach ($slots as $slot) {
@@ -258,19 +243,18 @@ function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = fa
                     $targetqa = $targetquba->get_question_attempt($slot->slot);
                     $targetgrade = $targetqa->get_fraction();
 
-                    // Условия пропуска:
-                    if (is_null($grade) || $actualgrade <= 0) {
-                        log_message("        Эссе (слот {$slot->slot}): оценка 0 (не переносится)", $verbose);
+                    // Условия пропуска
+                    if (is_null($grade) || $actualgrade <= 0 || $actualgrade < $maxmark) {
+                        log_message("        Эссе (слот {$slot->slot}): оценка $actualgrade (не переносится)", $verbose);
                         continue;
                     }
-
                     if (!is_null($targetgrade) && $targetgrade) {
                         $skippedalreadygraded++;
                         log_message("        Эссе (слот {$slot->slot}): пропущено (оценка уже существует)", $verbose);
                         continue;
                     }
 
-                    // Получаем feedback из последнего шага
+                    // Получаем feedback из последнего шага.
                     $feedback = '';
                     $laststep = $sourceqa->get_last_step();
                     if ($laststep) {
@@ -283,18 +267,13 @@ function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = fa
                     }
 
                     if (!$dryrun) {
-                        // Устанавливаем оценку через стандартный API
-                        $targetqa->manual_grade(
-                            $feedback,
-                            $actualgrade,
-                            FORMAT_HTML
-                        );
-
+                        // Устанавливаем оценку через стандартный API.
+                        $targetqa->manual_grade($feedback, $actualgrade, FORMAT_HTML);
                         $count++;
                     }
 
                     log_message("        Эссе (слот {$slot->slot}): перенесено {$actualgrade}/{$maxmark}" .
-                              ($dryrun ? " (тестовый режим)" : ""), $verbose);
+                        ($dryrun ? " (тестовый режим)" : ""), $verbose);
                 }
             } catch (Exception $e) {
                 log_message("        Ошибка слота {$slot->slot}: " . $e->getMessage(), true);
@@ -303,24 +282,20 @@ function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = fa
         }
 
         if (!$dryrun && $count > 0) {
-            // Сохраняем изменения
+            // Сохраняем изменения.
             question_engine::save_questions_usage_by_activity($targetquba);
 
-            // Обновляем статус попытки
+            // Пересчитываем суммарную оценку и обновляем попытку.
             $targetattempt->sumgrades = $targetquba->get_total_mark();
+            $targetattempt->state = 'finished';
             $targetattempt->timefinish = time();
             $DB->update_record('quiz_attempts', $targetattempt);
-
-            // Правильное обновление итоговой оценки
-            $quizobj = new quiz_settings($quiz, $cm, $quiz->course);
-            $gradecalculator = $quizobj->get_grade_calculator();
-            $gradecalculator->recompute_final_grade($targetattempt->userid);
         }
 
         log_message("      Итого: вопросов эссе: {$totalessays}, " .
-                  "перенесено: {$count}, " .
-                  "пропущено (оценка существует): {$skippedalreadygraded}" .
-                  ($dryrun ? " (тестовый режим)" : ""), true);
+            "перенесено: {$count}, " .
+            "пропущено (оценка существует): {$skippedalreadygraded}" .
+            ($dryrun ? " (тестовый режим)" : ""), true);
 
         return $count;
     } catch (Exception $e) {

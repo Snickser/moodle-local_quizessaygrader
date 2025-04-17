@@ -44,7 +44,7 @@ require_capability('mod/quiz:grade', $context);
 // Заголовки страницы
 $PAGE->set_url('/local/quizessaygrader/index.php', ['id' => $id, 'mod' => $cmid, 'qid' => $qid]);
 $PAGE->set_context($context);
-if($cmid) {
+if ($cmid) {
     $PAGE->set_cm($cm);
 }
 $PAGE->set_title(get_string('pluginname', 'local_quizessaygrader'));

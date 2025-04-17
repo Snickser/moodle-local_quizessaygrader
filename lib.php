@@ -14,17 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * lib file for plugin 'local_quizessaygrader'
+ *
+ * @package     local_quizessaygrader
+ * @copyright   2025 Alex Orlov <snickser@gmail.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 function local_quizessaygrader_extend_settings_navigation(settings_navigation $settingsnav, context $context) {
     global $PAGE;
 
-    if (!has_capability('mod/quiz:grade', $context)) {
+    if (!has_capability('mod/quiz:grade', $context) && !has_capability('mod/quiz:regrade', $context)) {
         return;
     }
 
     if ($context->contextlevel == CONTEXT_MODULE && $PAGE->cm->modname === 'quiz') {
-        // Найдём родительский раздел, куда добавить пункт
+        // Найдём родительский раздел, куда добавить пункт.
         $modulenode = $settingsnav->get('modulesettings');
 
         if ($modulenode) {
@@ -33,29 +41,27 @@ function local_quizessaygrader_extend_settings_navigation(settings_navigation $s
                 'mod' => $PAGE->cm->id,
                 'qid' => $PAGE->cm->instance,
             ]);
-
             $name = get_string('pluginmenutitle', 'local_quizessaygrader');
 
-            $modulenode->add($name, $url, navigation_node::TYPE_SETTING, null, 'quizessaygrader');
+            $modulenode->add($name, $url, navigation_node::TYPE_SETTING, null, 'local_quizessaygrader_menu');
         }
-    }
-    if ($coursenode = $settingsnav->find('courseadmin', navigation_node::TYPE_COURSE)) {
-            // Ссылка на скрипт плагина
+    } else if ($coursenode = $settingsnav->find('courseadmin', navigation_node::TYPE_COURSE)) {
+        // Ссылка на скрипт плагина.
         $url = new moodle_url('/local/quizessaygrader/index.php', [
-                'id' => $PAGE->course->id,
-
+            'id' => $PAGE->course->id,
         ]);
 
-                 // Добавление пункта меню
-                         $coursenode->add(
-                             get_string('pluginmenutitle', 'local_quizessaygrader'),
-                             $url,
-                             navigation_node::TYPE_SETTING,
-                             null,
-                             'local_quizessaygrader_menu',
-                             new pix_icon('i/report', '') // можно заменить иконку при желании
-                         );
+        // Добавление пункта меню.
+        $coursenode->add(
+            get_string('pluginmenutitle', 'local_quizessaygrader'),
+            $url,
+            navigation_node::TYPE_SETTING,
+            null,
+            'local_quizessaygrader_menu',
+            new pix_icon('i/report', '')
+        );
     }
+
 }
 
 function log_message($message, $verbose = false, $force = false) {
@@ -111,16 +117,16 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
                 if ($question->get_type_name() == 'essay') {
                     $totalessays++;
 
-                    // Получаем оценку из исходной попытки
+                    // Получаем оценку из исходной попытки.
                     $grade = $sourceqa->get_fraction();
                     $maxmark = $sourceqa->get_max_mark();
                     $actualgrade = $grade * $maxmark;
 
-                    // Проверяем оценку в целевой попытке
+                    // Проверяем оценку в целевой попытке.
                     $targetqa = $targetquba->get_question_attempt($slot->slot);
                     $targetgrade = $targetqa->get_fraction();
 
-                    // Условия пропуска
+                    // Условия пропуска.
                     $maxgrade = $maxmark;
                     if ($gradetype) {
                         $maxgrade = $actualgrade;

@@ -106,7 +106,7 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
 	'userid' => $userid,
 	'courseid' => $courseid,
 	'quizid' => $quizid,
-	'verbose' => $verbose,
+	'verbose' => get_config('local_quizessaygrader', 'verbose'),
 	'dryrun' => $dryrun,
 	'maxusers' => 0,
     ];

@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use mod_quiz\quiz_settings;
+
 /**
  * lib file for plugin 'local_quizessaygrader'
  *
@@ -32,7 +34,7 @@ function local_quizessaygrader_extend_settings_navigation(settings_navigation $s
     }
 
     if (!get_config('local_quizessaygrader', 'menu')) {
-	return;
+        return;
     }
 
     if ($context->contextlevel == CONTEXT_MODULE && $PAGE->cm->modname === 'quiz') {
@@ -66,8 +68,6 @@ function local_quizessaygrader_extend_settings_navigation(settings_navigation $s
         );
     }
 }
-
-use mod_quiz\quiz_settings;
 
 function log_message($message, $verbose = false, $force = false) {
     if ($verbose || $force) {
@@ -103,12 +103,12 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
     require_once($CFG->dirroot . '/mod/quiz/classes/grade_calculator.php');
 
     $options = [
-	'userid' => $userid,
-	'courseid' => $courseid,
-	'quizid' => $quizid,
-	'verbose' => get_config('local_quizessaygrader', 'verbose'),
-	'dryrun' => $dryrun,
-	'maxusers' => 0,
+    'userid' => $userid,
+    'courseid' => $courseid,
+    'quizid' => $quizid,
+    'verbose' => get_config('local_quizessaygrader', 'verbose'),
+    'dryrun' => $dryrun,
+    'maxusers' => 0,
     ];
 
     $gradetype = get_config('local_quizessaygrader', 'gradetype');
@@ -217,7 +217,6 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
     log_message("Всего обработано пользователей: {$processedusers}", $verbose);
 }
 
-
 function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbose = false, $dryrun = false, $gradetype = 0) {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/mod/quiz/locallib.php');
@@ -317,7 +316,8 @@ function essaygrader_attempt_submitted(\mod_quiz\event\attempt_submitted $event)
 
     // Выполнить.
     if (get_config('local_quizessaygrader', 'event')) {
-	essaygrader($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);
+        essaygrader($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);
     }
+
     return true;
 }

@@ -34,10 +34,12 @@ ETH 0x1bce7aadef39d328d262569e6194febe597cb2c9<br>
 <iframe src="https://yoomoney.ru/quickpay/fundraise/button?billNumber=143H2JO3LLE.240720"
 width="330" height="50" frameborder="0" allowtransparency="true" scrolling="no"></iframe>';
 $string['pluginname'] = 'Quiz Essay Grade Copy Tool';
-$string['pluginname_help'] = 'A plugin that makes teachers jobs easier automatically carries over students successful essay grades to assignments from the previous attempt. You need to manually enable the scheduled task to run!';
+$string['pluginname_help'] = 'A plugin that makes teachers jobs easier automatically carries over students successful essay grades to assignments from the previous attempt. You can manually enable a scheduled task to run.';
 $string['transferessaygrades'] = 'Transfer Essay Grades';
 $string['gradetype'] = 'Grade type';
 $string['gradetype_desc'] = 'Specifies which grade to copy, only the maximum grade or any grade greater than zero.';
 $string['dryrun'] = 'Test mode';
 $string['verbose'] = 'Verbose output';
 $string['pluginmenutitle'] = 'Quiz Essay Grade Copy Tool';
+$string['eventmode'] = 'Enable event mode';
+$string['menumode'] = 'Enable menu mode';

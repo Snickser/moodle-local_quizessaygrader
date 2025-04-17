@@ -48,8 +48,8 @@ if ($hassiteconfig) {
         get_string('pluginname_help', 'local_quizessaygrader'),
     ));
 
-    $options = [0 => get_string('highgradeletter', 'grades'),
-                1 => get_string('real', 'grades'),
+    $options = [0 => get_string('maxmark', 'quiz'),
+                1 => get_string('partiallycorrect', 'question'),
     ];
     $settings->add(new admin_setting_configselect(
         'local_quizessaygrader/gradetype',
@@ -70,6 +70,20 @@ if ($hassiteconfig) {
         'local_quizessaygrader/verbose',
         get_string('verbose', 'local_quizessaygrader'),
         '',
+        0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_quizessaygrader/event',
+        get_string('eventmode', 'local_quizessaygrader'),
+        '',
         1
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_quizessaygrader/menu',
+        get_string('menumode', 'local_quizessaygrader'),
+        '',
+        0
     ));
 }

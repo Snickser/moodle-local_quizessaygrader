@@ -315,8 +315,6 @@ function essaygrader_attempt_submitted(\mod_quiz\event\attempt_submitted $event)
     // Получаем данные о событии.
     $eventdata = $event->get_data();
 
-debugging(serialize($eventdata), DEBUG_DEVELOPER);
-
     // Выполнить.
     if (get_config('local_quizessaygrader', 'event')) {
 	essaygrader($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);

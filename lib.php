@@ -14,14 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 defined('MOODLE_INTERNAL') || die();
 
 function local_quizessaygrader_extend_settings_navigation(settings_navigation $settingsnav, context $context) {
     global $PAGE;
 
-    if ($context->contextlevel == CONTEXT_MODULE && $PAGE->cm->modname === 'quiz' && has_capability('mod/quiz:grade', $context)
-    ) {
+    if (!has_capability('mod/quiz:grade', $context)) {
+        return;
+    }
+
+    if ($context->contextlevel == CONTEXT_MODULE && $PAGE->cm->modname === 'quiz') {
         // Найдём родительский раздел, куда добавить пункт
         $modulenode = $settingsnav->get('modulesettings');
 
@@ -32,16 +34,33 @@ function local_quizessaygrader_extend_settings_navigation(settings_navigation $s
                 'qid' => $PAGE->cm->instance,
             ]);
 
-            $name = get_string('pluginname', 'local_quizessaygrader');
+            $name = get_string('pluginmenutitle', 'local_quizessaygrader');
 
             $modulenode->add($name, $url, navigation_node::TYPE_SETTING, null, 'quizessaygrader');
         }
+    }
+    if ($coursenode = $settingsnav->find('courseadmin', navigation_node::TYPE_COURSE)) {
+            // Ссылка на скрипт плагина
+        $url = new moodle_url('/local/quizessaygrader/index.php', [
+                'id' => $PAGE->course->id,
+
+        ]);
+
+                 // Добавление пункта меню
+                         $coursenode->add(
+                             get_string('pluginmenutitle', 'local_quizessaygrader'),
+                             $url,
+                             navigation_node::TYPE_SETTING,
+                             null,
+                             'local_quizessaygrader_menu',
+                             new pix_icon('i/report', '') // можно заменить иконку при желании
+                         );
     }
 }
 
 function log_message($message, $verbose = false, $force = false) {
     if ($verbose || $force) {
-        echo str_replace(' ', '&nbsp;', $message) . '<br>';
+        echo str_replace('  ', '&nbsp;', $message) . '<br>';
     }
 }
 
@@ -104,7 +123,7 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
                     // Условия пропуска
                     $maxgrade = $maxmark;
                     if ($gradetype) {
-                	$maxgrade = $actualgrade;
+                        $maxgrade = $actualgrade;
                     }
                     if (is_null($grade) || $actualgrade <= 0 || $actualgrade < $maxgrade) {
                         log_message("        Эссе (слот {$slot->slot}): оценка $actualgrade (не переносится)", $verbose);
@@ -116,26 +135,15 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
                         continue;
                     }
 
-                    // Получаем feedback из последнего шага.
-                    $feedback = '';
-                    $laststep = $sourceqa->get_last_step();
-                    if ($laststep) {
-                        $stepdata = $laststep->get_all_data();
-                        if (isset($stepdata['-feedback'])) {
-                            $feedback = $stepdata['-feedback'];
-                        } else if (isset($stepdata['-comment'])) {
-                            $feedback = $stepdata['-comment'];
-                        }
-                    }
-
                     if (!$dryrun) {
                         // Устанавливаем оценку через стандартный API.
+                        $feedback = 'auto';
                         $targetqa->manual_grade($feedback, $actualgrade, FORMAT_HTML);
                         $count++;
                     }
 
                     log_message("        <b>Эссе (слот {$slot->slot}): перенесено {$actualgrade}/{$maxmark}</b>" .
-                        ($dryrun ? " (тестовый режим)" : ""), $verbose);
+                        ($dryrun ? " [тестовый режим]" : ""), $verbose);
                 }
             } catch (Exception $e) {
                 log_message("        Ошибка слота {$slot->slot}: " . $e->getMessage(), true);
@@ -149,14 +157,14 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
 
             // Пересчитываем суммарную оценку и обновляем попытку.
             $targetattempt->sumgrades = $targetquba->get_total_mark();
-//            $targetattempt->timefinish = time();
+            // $targetattempt->timefinish = time();
             $DB->update_record('quiz_attempts', $targetattempt);
         }
 
         log_message("      Итого: вопросов эссе: {$totalessays}, " .
             "перенесено: {$count}, " .
             "пропущено (оценка существует): {$skippedalreadygraded}" .
-            ($dryrun ? " (тестовый режим)" : ""), true);
+            ($dryrun ? " [тестовый режим]" : ""), true);
 
         return $count;
     } catch (Exception $e) {

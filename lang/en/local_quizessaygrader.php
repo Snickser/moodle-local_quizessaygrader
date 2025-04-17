@@ -40,3 +40,4 @@ $string['gradetype'] = 'Grade type';
 $string['gradetype_desc'] = 'Specifies which grade to copy, only the maximum grade or any grade greater than zero.';
 $string['dryrun'] = 'Test mode';
 $string['verbose'] = 'Verbose output';
+$string['pluginmenutitle'] = 'Quiz Essay Grade Copy Tool';

@@ -55,12 +55,12 @@ class quizessaygrader extends \core\task\scheduled_task {
         \raise_memory_limit(MEMORY_HUGE);
 
         $options = [
-    	    'courseid' => 0,
-    	    'quizid' => 0,
-    	    'userid' => 0,
-    	    'verbose' => get_config('local_quizessaygrader', 'verbose'),
-    	    'dryrun' => get_config('local_quizessaygrader', 'dryrun'),
-    	    'maxusers' => 0,
+            'courseid' => 0,
+            'quizid' => 0,
+            'userid' => 0,
+            'verbose' => get_config('local_quizessaygrader', 'verbose'),
+            'dryrun' => get_config('local_quizessaygrader', 'dryrun'),
+            'maxusers' => 0,
         ];
 
         $gradetype = get_config('local_quizessaygrader', 'gradetype');
@@ -167,7 +167,6 @@ class quizessaygrader extends \core\task\scheduled_task {
         $totaltime = time() - $starttime;
         self::log_message("\nОбработка завершена за {$totaltime} секунд", true);
         self::log_message("Всего обработано пользователей: {$processedusers}", true);
-
     }
 
     private function log_message($message, $verbose = false, $force = false) {

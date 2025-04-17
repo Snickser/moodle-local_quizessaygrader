@@ -94,7 +94,6 @@ function quiz_has_essay_questions($quizid) {
 }
 
 try {
-
     $gradetype = get_config('local_quizessaygrader', 'gradetype');
 
     $transaction = $DB->start_delegated_transaction();
@@ -248,7 +247,7 @@ function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = fa
                     // Условия пропуска
                     $maxgrade = $maxmark;
                     if ($gradetype) {
-                	$maxgrade = $actualgrade;
+                        $maxgrade = $actualgrade;
                     }
                     if (is_null($grade) || $actualgrade <= 0 || $actualgrade < $maxgrade) {
                         log_message("        Эссе (слот {$slot->slot}): оценка $actualgrade (не переносится)", $verbose);

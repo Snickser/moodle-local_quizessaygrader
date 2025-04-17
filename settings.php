@@ -72,6 +72,4 @@ if ($hassiteconfig) {
         '',
         1
     ));
-
 }
-

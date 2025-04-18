@@ -71,7 +71,11 @@ function local_quizessaygrader_extend_settings_navigation(settings_navigation $s
 
 function log_message($message, $verbose = false, $force = false) {
     if ($verbose || $force) {
-        echo str_replace('  ', '&nbsp;', $message) . '<br>';
+        if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
+            echo $message . "\n";
+        } else {
+            echo str_replace('  ', '&nbsp;', $message) . "<br>\n";
+        }
     }
 }
 
@@ -327,8 +331,8 @@ function essaygrader_attempt_submitted(\mod_quiz\event\attempt_submitted $event)
 
     // Выполнить.
     if (get_config('local_quizessaygrader', 'event')) {
-        essaygrader($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);
+        $count = essaygrader($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);
     }
 
-    return true;
+    return $count;
 }

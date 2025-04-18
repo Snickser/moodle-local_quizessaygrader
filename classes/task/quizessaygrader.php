@@ -53,6 +53,8 @@ class quizessaygrader extends \core\task\scheduled_task {
 
         $count = essaygrader(0, 0, 0, $verbose, $dryrun);
 
-        return $count;
+        mtrace("Processed: $count");
+
+        return true;
     }
 }

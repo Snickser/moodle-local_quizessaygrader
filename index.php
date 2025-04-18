@@ -63,11 +63,9 @@ echo $OUTPUT->single_button($PAGE->url . '&dryrun=0&sesskey=' . sesskey(), get_s
 
 if ($cmid) {
     $url = new moodle_url('/mod/quiz/report.php', ['id' => $cmid]);
-    $text = get_string('back');
 } else {
     $url = new moodle_url('/course/view.php', ['id' => $course->id]);
-    $text = get_string('backtocourse', 'quiz');
 }
-echo $OUTPUT->single_button($url, $text, 'get', ['type' => 'primary']);
+echo $OUTPUT->single_button($url, get_string('back'), 'get', ['type' => 'primary']);
 
 echo $OUTPUT->footer();

@@ -260,15 +260,12 @@ function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = fa
                     }
 
                     // Получаем feedback из последнего шага.
-                    $feedback = '';
+                    $feedback = 'auto';
                     $laststep = $sourceqa->get_last_step();
-                    if ($laststep) {
-                        $stepdata = $laststep->get_all_data();
-                        if (isset($stepdata['-feedback'])) {
-                            $feedback = $stepdata['-feedback'];
-                        } else if (isset($stepdata['-comment'])) {
-                            $feedback = $stepdata['-comment'];
-                        }
+                    if ($laststep->has_behaviour_var('comment')) {
+                        $feedback = $laststep->get_behaviour_var('comment');
+                    } elseif ($laststep->has_behaviour_var('feedback')) {
+                        $feedback = $laststep->get_behaviour_var('feedback');
                     }
 
                     if (!$dryrun) {
@@ -290,9 +287,8 @@ function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = fa
             // Сохраняем изменения.
             question_engine::save_questions_usage_by_activity($targetquba);
 
-            // Пересчитываем суммарную оценку и обновляем попытку.
+            // Пересчитываем суммарную оценку.
             $targetattempt->sumgrades = $targetquba->get_total_mark();
-            $targetattempt->timefinish = time();
             $DB->update_record('quiz_attempts', $targetattempt);
         }
 

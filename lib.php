@@ -272,9 +272,20 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
                         continue;
                     }
 
+                    // Получаем feedback из последнего шага.
+                    $feedback = 'auto';
+                    $laststep = $sourceqa->get_last_step();
+                    if ($laststep->has_behaviour_var('comment')) {
+            		$text = $laststep->get_behaviour_var('comment');
+                	if (strlen($text)) {
+                    	    $feedback = $text;
+                    	}
+                    } elseif ($laststep->has_behaviour_var('feedback')) {
+                        $feedback = $laststep->get_behaviour_var('feedback');
+                    }
+
                     if (!$dryrun) {
                         // Устанавливаем оценку через стандартный API.
-                        $feedback = 'auto';
                         $targetqa->manual_grade($feedback, $actualgrade, FORMAT_HTML);
                         $count++;
                     }
@@ -292,7 +303,7 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
             // Сохраняем изменения.
             question_engine::save_questions_usage_by_activity($targetquba);
 
-            // Пересчитываем суммарную оценку и обновляем попытку.
+    	    // Пересчитываем суммарную оценку.
             $targetattempt->sumgrades = $targetquba->get_total_mark();
             $DB->update_record('quiz_attempts', $targetattempt);
         }

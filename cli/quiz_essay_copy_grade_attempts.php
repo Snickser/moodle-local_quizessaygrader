@@ -264,7 +264,7 @@ function transfer_essay_grades($sourceattemptid, $targetattemptid, $verbose = fa
                     $laststep = $sourceqa->get_last_step();
                     if ($laststep->has_behaviour_var('comment')) {
                         $feedback = $laststep->get_behaviour_var('comment');
-                    } elseif ($laststep->has_behaviour_var('feedback')) {
+                    } else if ($laststep->has_behaviour_var('feedback')) {
                         $feedback = $laststep->get_behaviour_var('feedback');
                     }
 

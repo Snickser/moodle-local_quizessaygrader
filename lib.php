@@ -331,8 +331,8 @@ function essaygrader_attempt_submitted(\mod_quiz\event\attempt_submitted $event)
 
     // Выполнить.
     if (get_config('local_quizessaygrader', 'event')) {
-        essaygrader($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);
+        $count = essaygrader($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);
     }
 
-    return true;
+    return $count;
 }

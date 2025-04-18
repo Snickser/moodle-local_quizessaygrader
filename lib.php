@@ -219,6 +219,8 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
     $totaltime = time() - $starttime;
     log_message("\nОбработка завершена за {$totaltime} секунд", $verbose);
     log_message("Всего обработано пользователей: {$processedusers}", $verbose);
+
+    return $count;
 }
 
 function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbose = false, $dryrun = false, $gradetype = 0) {

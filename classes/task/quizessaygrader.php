@@ -247,15 +247,15 @@ class quizessaygrader extends \core\task\scheduled_task {
                         }
 
                         // Получаем feedback из последнего шага.
-                        $feedback = '';
+                        $feedback = 'auto';
                         $laststep = $sourceqa->get_last_step();
-                        if ($laststep) {
-                            $stepdata = $laststep->get_all_data();
-                            if (isset($stepdata['-feedback'])) {
-                                $feedback = $stepdata['-feedback'];
-                            } else if (isset($stepdata['-comment'])) {
-                                $feedback = $stepdata['-comment'];
+                        if ($laststep->has_behaviour_var('comment')) {
+                            $text = $laststep->get_behaviour_var('comment');
+                            if (strlen($text)) {
+                                $feedback = $text;
                             }
+                        } else if ($laststep->has_behaviour_var('feedback')) {
+                            $feedback = $laststep->get_behaviour_var('feedback');
                         }
 
                         if (!$dryrun) {
@@ -279,8 +279,6 @@ class quizessaygrader extends \core\task\scheduled_task {
 
                 // Пересчитываем суммарную оценку и обновляем попытку.
                 $targetattempt->sumgrades = $targetquba->get_total_mark();
-                $targetattempt->state = 'finished';
-                $targetattempt->timefinish = time();
                 $DB->update_record('quiz_attempts', $targetattempt);
             }
 

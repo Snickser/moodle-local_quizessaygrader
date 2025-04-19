@@ -24,8 +24,6 @@
 
 use mod_quiz\quiz_settings;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Extends the settings navigation with the quiz essay grader items.
  *
@@ -60,9 +58,8 @@ function local_quizessaygrader_extend_settings_navigation(settings_navigation $s
 
             $modulenode->add($name, $url, navigation_node::TYPE_SETTING, null, 'local_quizessaygrader_menu');
         }
-    }
     // Add to course administration menu.
-    else if ($coursenode = $settingsnav->find('courseadmin', navigation_node::TYPE_COURSE)) {
+    } else if ($coursenode = $settingsnav->find('courseadmin', navigation_node::TYPE_COURSE)) {
         // Link to plugin script.
         $url = new moodle_url('/local/quizessaygrader/index.php', [
             'id' => $PAGE->course->id,

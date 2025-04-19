@@ -14,13 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Library file for plugin 'local_quizessaygrader'.
+ *
+ * @package     local_quizessaygrader
+ * @copyright   2025 Alex Orlov <snickser@gmail.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 require_once(__DIR__ . '/../lib.php');
 
-// Обработка параметров командной строки
 [$options, $unrecognized] = cli_get_params([
     'help' => false,
     'source' => 0,

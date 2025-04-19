@@ -1,5 +1,5 @@
 <?php
-// This file is part of the bank paymnts module for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,33 +12,40 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-use mod_quiz\quiz_settings;
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * lib file for plugin 'local_quizessaygrader'
+ * Library file for plugin 'local_quizessaygrader'.
  *
  * @package     local_quizessaygrader
  * @copyright   2025 Alex Orlov <snickser@gmail.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+use mod_quiz\quiz_settings;
 
+/**
+ * Extends the settings navigation with the quiz essay grader items.
+ *
+ * @param settings_navigation $settingsnav The settings navigation object.
+ * @param context $context The current context.
+ */
 function local_quizessaygrader_extend_settings_navigation(settings_navigation $settingsnav, context $context) {
     global $PAGE;
 
+    // Check if user has grading capabilities.
     if (!has_capability('mod/quiz:grade', $context) && !has_capability('mod/quiz:regrade', $context)) {
         return;
     }
 
+    // Check if menu is enabled in plugin settings.
     if (!get_config('local_quizessaygrader', 'menu')) {
         return;
     }
 
+    // Add to quiz module settings.
     if ($context->contextlevel == CONTEXT_MODULE && $PAGE->cm->modname === 'quiz') {
-        // Найдём родительский раздел, куда добавить пункт.
+        // Find the parent section to add our item.
         $modulenode = $settingsnav->get('modulesettings');
 
         if ($modulenode) {
@@ -51,13 +58,13 @@ function local_quizessaygrader_extend_settings_navigation(settings_navigation $s
 
             $modulenode->add($name, $url, navigation_node::TYPE_SETTING, null, 'local_quizessaygrader_menu');
         }
+        // Add to course administration menu.
     } else if ($coursenode = $settingsnav->find('courseadmin', navigation_node::TYPE_COURSE)) {
-        // Ссылка на скрипт плагина.
+        // Link to plugin script.
         $url = new moodle_url('/local/quizessaygrader/index.php', [
             'id' => $PAGE->course->id,
         ]);
 
-        // Добавление пункта меню.
         $coursenode->add(
             get_string('pluginmenutitle', 'local_quizessaygrader'),
             $url,
@@ -69,6 +76,13 @@ function local_quizessaygrader_extend_settings_navigation(settings_navigation $s
     }
 }
 
+/**
+ * Outputs a log message either to CLI or HTML output.
+ *
+ * @param string $message The message to log.
+ * @param bool $verbose Whether to output the message.
+ * @param bool $force Whether to force output regardless of verbose setting.
+ */
 function log_message($message, $verbose = false, $force = false) {
     if ($verbose || $force) {
         if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
@@ -79,13 +93,19 @@ function log_message($message, $verbose = false, $force = false) {
     }
 }
 
+/**
+ * Checks if a quiz contains any essay questions.
+ *
+ * @param int $quizid The ID of the quiz to check.
+ * @return bool True if the quiz contains essay questions, false otherwise.
+ */
 function quiz_has_essay_questions($quizid) {
     global $DB;
 
     $sql = "SELECT COUNT(q.id)
             FROM {quiz_slots} qs
-            JOIN {question_references} qr ON qr.itemid = qs.id 
-                AND qr.component = 'mod_quiz' 
+            JOIN {question_references} qr ON qr.itemid = qs.id
+                AND qr.component = 'mod_quiz'
                 AND qr.questionarea = 'slot'
             JOIN {question_bank_entries} qbe ON qbe.id = qr.questionbankentryid
             JOIN {question_versions} qv ON qv.questionbankentryid = qbe.id
@@ -95,6 +115,16 @@ function quiz_has_essay_questions($quizid) {
     return $DB->count_records_sql($sql, [$quizid]) > 0;
 }
 
+/**
+ * Main function for grading essays in quizzes.
+ *
+ * @param int $courseid Optional course ID to limit processing.
+ * @param int $quizid Optional quiz ID to limit processing.
+ * @param int $userid Optional user ID to limit processing.
+ * @param bool $verbose Whether to output verbose logging.
+ * @param bool $dryrun Whether to perform a dry run without saving changes.
+ * @return int Number of grades transferred.
+ */
 function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dryrun = 1) {
     global $DB, $CFG;
 
@@ -107,24 +137,25 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
     require_once($CFG->dirroot . '/mod/quiz/classes/grade_calculator.php');
 
     $options = [
-    'userid' => $userid,
-    'courseid' => $courseid,
-    'quizid' => $quizid,
-    'verbose' => get_config('local_quizessaygrader', 'verbose'),
-    'dryrun' => $dryrun,
-    'maxusers' => 0,
+        'userid' => $userid,
+        'courseid' => $courseid,
+        'quizid' => $quizid,
+        'verbose' => get_config('local_quizessaygrader', 'verbose'),
+        'dryrun' => $dryrun,
+        'maxusers' => 0,
     ];
 
     $gradetype = get_config('local_quizessaygrader', 'gradetype');
 
+    // Start database transaction.
     $transaction = $DB->start_delegated_transaction();
     $starttime = time();
     $processedusers = 0;
 
-    log_message("Начало обработки в " . date('Y-m-d H:i:s') .
-           ($options['dryrun'] ? " <font color=blue><b>[ ТЕСТОВЫЙ РЕЖИМ ]</b></font>" : ""), $verbose);
+    log_message("Processing started at " . date('Y-m-d H:i:s') .
+           ($options['dryrun'] ? " <font color=blue><b>[ TEST MODE ]</b></font>" : ""), $verbose);
 
-    // Получаем список курсов.
+    // Get the list of courses.
     $courses = $DB->get_records_select(
         'course',
         $options['courseid'] > 0 ? 'id = ?' : '1=1',
@@ -132,13 +163,14 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
     );
 
     foreach ($courses as $course) {
+        // Check if we've reached max users limit.
         if ($options['maxusers'] > 0 && $processedusers >= $options['maxusers']) {
             break;
         }
 
-        log_message("\nКурс: " . format_string($course->fullname) . " (ID: {$course->id})", $verbose);
+        log_message("\nCourse: " . format_string($course->fullname) . " (ID: {$course->id})", $verbose);
 
-        // Получаем quiz в курсе.
+        // Get quizzes in the course.
         $quizzes = $DB->get_records_select(
             'quiz',
             $options['quizid'] > 0 ? 'course = ? AND id = ?' : 'course = ?',
@@ -150,27 +182,29 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
                 break 2;
             }
 
-            log_message("  Тест: {$quiz->name} (ID: {$quiz->id})", $options['verbose']);
+            log_message("  Quiz: {$quiz->name} (ID: {$quiz->id})", $options['verbose']);
 
+            // Skip if quiz has no essay questions.
             if (!quiz_has_essay_questions($quiz->id)) {
                 continue;
             }
 
-            // Получаем пользователей с попытками (упорядочиваем по attempt ASC - от старых к новым).
+            // Get users with attempts (ordered by attempt ASC - from oldest to newest).
             $attempts = $DB->get_records_select(
                 'quiz_attempts',
                 $options['userid'] > 0 ? 'quiz = ? AND state = ? AND userid = ?' : 'quiz = ? AND state = ?',
                 $options['userid'] > 0 ? [$quiz->id, 'finished', $options['userid']] : [$quiz->id, 'finished'],
-                'userid, attempt ASC' // Сортируем по возрастанию номера попытки.
+                'userid, attempt ASC'
             );
 
-            // Группируем попытки по пользователям (теперь первая попытка - самая ранняя).
+            // Group attempts by users (now the first attempt is the earliest).
             $usersattempts = [];
             foreach ($attempts as $attempt) {
                     $usersattempts[$attempt->userid][] = $attempt;
             }
 
             foreach ($usersattempts as $userid => $userattempts) {
+                // Skip if user is not enrolled in course.
                 if (!is_enrolled(context_course::instance($course->id), $userid)) {
                     continue;
                 }
@@ -179,63 +213,82 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
                     break 3;
                 }
 
+                // Skip if user has less than 2 attempts.
                 if (count($userattempts) < 2) {
                     continue;
                 }
 
                 $user = $DB->get_record('user', ['id' => $userid], 'id, firstname, lastname');
-                log_message("    Пользователь: {$user->firstname} {$user->lastname} (ID: {$user->id})", $options['verbose']);
+                log_message("    User: {$user->firstname} {$user->lastname} (ID: {$user->id})", $options['verbose']);
 
-                // Берем две последние попытки.
-                $lastattempt = end($userattempts); // Самая новая попытка.
+                // Take the two most recent attempts.
+                $lastattempt = end($userattempts); // The newest attempt.
                 prev($userattempts);
-                $prevattempt = current($userattempts); // Предыдущая попытка.
+                $prevattempt = current($userattempts); // The previous attempt.
 
-                log_message("      Перенос оценок из попытки #{$prevattempt->attempt} в попытку #{$lastattempt->attempt}", $options['verbose']);
+                log_message("      Transferring grades from attempt #{$prevattempt->attempt}" .
+                " to attempt #{$lastattempt->attempt}", $options['verbose']);
 
                 try {
-                    $count = essaygrader_transfer_grades($prevattempt->id, $lastattempt->id, $options['verbose'], $options['dryrun'], $gradetype);
+                    $count = essaygrader_transfer_grades(
+                        $prevattempt->id,
+                        $lastattempt->id,
+                        $options['verbose'],
+                        $options['dryrun'],
+                        $gradetype
+                    );
                     if ($count > 0) {
                         $processedusers++;
-                        log_message("      Успешно перенесено оценок: {$count}", $options['verbose']);
+                        log_message("      Successfully transferred grades: {$count}", $options['verbose']);
                     }
                 } catch (Exception $e) {
-                    log_message("      Ошибка: " . $e->getMessage(), $verbose);
+                    log_message("      Error: " . $e->getMessage(), $verbose);
                     continue;
                 }
             }
         }
     }
 
-    // Фиксируем изменения.
+    // Commit or rollback changes based on dryrun setting.
     if (!$options['dryrun']) {
         $transaction->allow_commit();
-        log_message("Изменения сохранены в базе данных", $verbose);
+        log_message("Changes saved to database", $verbose);
     } else {
         $DB->force_transaction_rollback();
-        log_message("Транзакция отменена [тестовый режим]", $verbose);
+        log_message("Transaction rolled back [test mode]", $verbose);
     }
 
     $totaltime = time() - $starttime;
-    log_message("\nОбработка завершена за {$totaltime} секунд", $verbose);
-    log_message("Всего обработано пользователей: {$processedusers}", $verbose);
+    log_message("\nProcessing completed in {$totaltime} seconds", $verbose);
+    log_message("Total users processed: {$processedusers}", $verbose);
 
     return $count;
 }
 
+/**
+ * Transfers grades from one quiz attempt to another for essay questions.
+ *
+ * @param int $sourceattemptid The source attempt ID to copy grades from.
+ * @param int $targetattemptid The target attempt ID to copy grades to.
+ * @param bool $verbose Whether to output verbose logging.
+ * @param bool $dryrun Whether to perform a dry run without saving changes.
+ * @param int $gradetype The type of grading to apply.
+ * @return int Number of grades transferred.
+ * @throws moodle_exception If grade transfer fails.
+ */
 function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbose = false, $dryrun = false, $gradetype = 0) {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/mod/quiz/locallib.php');
     require_once($CFG->libdir . '/gradelib.php');
 
     try {
-        // Получаем данные о попытках.
+        // Get attempt data.
         $sourceattempt = $DB->get_record('quiz_attempts', ['id' => $sourceattemptid], '*', MUST_EXIST);
         $targetattempt = $DB->get_record('quiz_attempts', ['id' => $targetattemptid], '*', MUST_EXIST);
         $quiz = $DB->get_record('quiz', ['id' => $targetattempt->quiz], '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('quiz', $quiz->id, $quiz->course, false, MUST_EXIST);
 
-        // Загружаем usage для попыток.
+        // Load question usage for attempts.
         $sourcequba = question_engine::load_questions_usage_by_activity($sourceattempt->uniqueid);
         $targetquba = question_engine::load_questions_usage_by_activity($targetattempt->uniqueid);
 
@@ -243,7 +296,7 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
         $totalessays = 0;
         $skippedalreadygraded = 0;
 
-        // Получаем слоты вопросов.
+        // Get question slots.
         $slots = $DB->get_records('quiz_slots', ['quizid' => $quiz->id], 'slot');
 
         foreach ($slots as $slot) {
@@ -254,31 +307,31 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
                 if ($question->get_type_name() == 'essay') {
                     $totalessays++;
 
-                    // Получаем оценку из исходной попытки.
+                    // Get grade from source attempt.
                     $grade = $sourceqa->get_fraction();
                     $maxmark = $sourceqa->get_max_mark();
                     $actualgrade = $grade * $maxmark;
 
-                    // Проверяем оценку в целевой попытке.
+                    // Check grade in target attempt.
                     $targetqa = $targetquba->get_question_attempt($slot->slot);
                     $targetgrade = $targetqa->get_fraction();
 
-                    // Условия пропуска.
+                    // Skip conditions.
                     $maxgrade = $maxmark;
                     if ($gradetype) {
                         $maxgrade = $actualgrade;
                     }
                     if (is_null($grade) || $actualgrade <= 0 || $actualgrade < $maxgrade) {
-                        log_message("        Эссе (слот {$slot->slot}): оценка $actualgrade (не переносится)", $verbose);
+                        log_message("        Essay (slot {$slot->slot}): grade $actualgrade (not transferred)", $verbose);
                         continue;
                     }
                     if (!is_null($targetgrade) && $targetgrade) {
                         $skippedalreadygraded++;
-                        log_message("        Эссе (слот {$slot->slot}): пропущено (оценка уже существует)", $verbose);
+                        log_message("        Essay (slot {$slot->slot}): skipped (grade already exists)", $verbose);
                         continue;
                     }
 
-                    // Получаем feedback из последнего шага.
+                    // Get feedback from last step.
                     $feedback = 'auto';
                     $laststep = $sourceqa->get_last_step();
                     if ($laststep->has_behaviour_var('comment')) {
@@ -291,33 +344,33 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
                     }
 
                     if (!$dryrun) {
-                        // Устанавливаем оценку через стандартный API.
+                        // Set grade using standard API.
                         $targetqa->manual_grade($feedback, $actualgrade, FORMAT_HTML);
                         $count++;
                     }
 
-                    log_message("        <b>Эссе (слот {$slot->slot}): перенесено {$actualgrade}/{$maxmark}</b>" .
-                        ($dryrun ? " [тестовый режим]" : ""), $verbose);
+                    log_message("        <b>Essay (slot {$slot->slot}): transferred {$actualgrade}/{$maxmark}</b>" .
+                        ($dryrun ? " [test mode]" : ""), $verbose);
                 }
             } catch (Exception $e) {
-                log_message("        Ошибка слота {$slot->slot}: " . $e->getMessage(), $verbose);
+                log_message("        Slot {$slot->slot} error: " . $e->getMessage(), $verbose);
                 continue;
             }
         }
 
         if (!$dryrun && $count > 0) {
-            // Сохраняем изменения.
+            // Save changes.
             question_engine::save_questions_usage_by_activity($targetquba);
 
-            // Пересчитываем суммарную оценку.
+            // Recalculate total grade.
             $targetattempt->sumgrades = $targetquba->get_total_mark();
             $DB->update_record('quiz_attempts', $targetattempt);
         }
 
-        log_message("      Итого: вопросов эссе: {$totalessays}, " .
-            "перенесено: {$count}, " .
-            "пропущено (оценка существует): {$skippedalreadygraded}" .
-            ($dryrun ? " [тестовый режим]" : ""), $verbose);
+        log_message("      Summary: essay questions: {$totalessays}, " .
+            "transferred: {$count}, " .
+            "skipped (grade exists): {$skippedalreadygraded}" .
+            ($dryrun ? " [test mode]" : ""), $verbose);
 
         return $count;
     } catch (Exception $e) {
@@ -325,13 +378,19 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
     }
 }
 
+/**
+ * Event observer for quiz attempt submissions.
+ *
+ * @param \mod_quiz\event\attempt_submitted $event The quiz attempt submitted event.
+ * @return int Number of grades transferred.
+ */
 function essaygrader_attempt_submitted(\mod_quiz\event\attempt_submitted $event) {
     global $DB, $CFG;
 
-    // Получаем данные о событии.
+    // Get event data.
     $eventdata = $event->get_data();
 
-    // Выполнить.
+    // Execute if event processing is enabled.
     if (get_config('local_quizessaygrader', 'event')) {
         $count = essaygrader($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);
     }

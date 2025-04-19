@@ -14,45 +14,57 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_quizessaygrader\task;
+
 /**
- * Send expiry notifications task.
+ * Scheduled task for automatically grading quiz essay questions.
+ *
+ * This task handles the automatic processing and grading of essay questions in quizzes
+ * according to configured rules and criteria.
  *
  * @package   local_quizessaygrader
  * @copyright 2025 Alex Orlov <snickser@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace local_quizessaygrader\task;
-
 class quizessaygrader extends \core\task\scheduled_task {
+
     /**
-     * Name for this task.
+     * Get a descriptive name for this task (shown to admins).
      *
-     * @return string
+     * @return string The name of this task
      */
     public function get_name() {
         return get_string('pluginname', 'local_quizessaygrader');
     }
 
     /**
-     * Run task for autocommits.
+     * Execute the task to automatically grade quiz essay questions.
      *
-     * @return string
+     * This function:
+     * 1. Sets up the execution environment with appropriate time and memory limits
+     * 2. Retrieves configuration settings for verbosity and dry-run mode
+     * 3. Calls the main essay grading function
+     * 4. Outputs processing statistics
+     *
+     * @return bool Always returns true unless there is a fatal error
+     * @throws \moodle_exception If there are problems executing the task
      */
     public function execute() {
         global $CFG;
         require_once($CFG->dirroot . '/local/quizessaygrader/lib.php');
 
-        // Unfortunately this may take a long time, it should not be interrupted,
-        // otherwise users get duplicate notification.
+        // Prevent timeouts and memory issues during processing.
         \core_php_time_limit::raise();
         \raise_memory_limit(MEMORY_HUGE);
 
+        // Get plugin configuration settings.
         $verbose = get_config('local_quizessaygrader', 'verbose');
-        $dryrun  = get_config('local_quizessaygrader', 'dryrun');
+        $dryrun = get_config('local_quizessaygrader', 'dryrun');
 
+        // Process essay questions and get count of processed items.
         $count = essaygrader(0, 0, 0, $verbose, $dryrun);
 
+        // Output processing statistics.
         mtrace("Processed: $count");
 
         return true;

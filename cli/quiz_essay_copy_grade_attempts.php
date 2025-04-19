@@ -192,10 +192,17 @@ try {
                 prev($userattempts);
                 $prevattempt = current($userattempts); // Previous attempt.
 
-                log_message("      Transferring grades from attempt #{$prevattempt->attempt} to attempt #{$lastattempt->attempt}", $options['verbose']);
+                log_message("      Transferring grades from attempt #{$prevattempt->attempt}" .
+                "to attempt #{$lastattempt->attempt}", $options['verbose']);
 
                 try {
-                    $count = transfer_essay_grades($prevattempt->id, $lastattempt->id, $options['verbose'], $options['dryrun'], $gradetype);
+                    $count = transfer_essay_grades(
+                        $prevattempt->id,
+                        $lastattempt->id,
+                        $options['verbose'],
+                        $options['dryrun'],
+                        $gradetype
+                    );
                     if ($count > 0) {
                         $processedusers++;
                         log_message("      Successfully transferred grades: {$count}", $options['verbose']);

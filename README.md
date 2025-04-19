@@ -1,7 +1,7 @@
 # moodle-local_quizessaygrader
 
-[![](https://img.shields.io/github/v/release/Snickser/moodle-paygw_bepaid.svg)](https://github.com/Snickser/moodle-paygw_bepaid/releases)
-[![Build Status](https://github.com/Snickser/moodle-paygw_bepaid/actions/workflows/moodle-ci.yml/badge.svg)](https://github.com/Snickser/moodle-paygw_bepaid/actions/workflows/moodle-ci.yml)
+[![](https://img.shields.io/github/v/release/Snickser/moodle-local_quizessaygrader.svg)](https://github.com/Snickser/moodle-local_quizessaygrader/releases)
+[![Build Status](https://github.com/Snickser/moodle-local_quizessaygrader/actions/workflows/moodle-ci.yml/badge.svg)](https://github.com/Snickser/moodle-local_quizessaygrader/actions/workflows/moodle-ci.yml)
 
 Плагин для облегчения труда учителей, автоматически переносит успешные оценки студента за эссе в заданиях из предыдущей попытки.
 

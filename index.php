@@ -16,11 +16,11 @@
 
 require('../../config.php');
 
-$id = required_param('id', PARAM_INT);    // ID курса.
+$id = required_param('id', PARAM_INT);    // ID course.
 
 require_login($id);
 
-$cmid = optional_param('mod', 0, PARAM_INT); // ID модуля (quiz).
+$cmid = optional_param('mod', 0, PARAM_INT); // ID modules (quiz).
 $qid = optional_param('qid', 0, PARAM_INT); // ID quiz.
 
 $verbose = optional_param('verbose', 1, PARAM_INT);
@@ -38,10 +38,10 @@ if ($cmid) {
     $context = context_course::instance($id);
 }
 
-// Проверка прав доступа
+// Check permission.
 require_capability('mod/quiz:grade', $context);
 
-// Заголовки страницы
+// Set page header.
 $PAGE->set_url('/local/quizessaygrader/index.php', ['id' => $id, 'mod' => $cmid, 'qid' => $qid]);
 $PAGE->set_context($context);
 if ($cmid) {
@@ -54,7 +54,7 @@ $PAGE->set_pagelayout('incourse');
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'local_quizessaygrader'));
 
-// Выполнить.
+// Execute.
 essaygrader($id, $qid, 0, $verbose, $dryrun);
 
 echo '<hr>';

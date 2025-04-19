@@ -6,13 +6,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Library file for plugin 'local_quizessaygrader'.
@@ -60,7 +60,7 @@ function local_quizessaygrader_extend_settings_navigation(settings_navigation $s
 
             $modulenode->add($name, $url, navigation_node::TYPE_SETTING, null, 'local_quizessaygrader_menu');
         }
-    } 
+    }
     // Add to course administration menu.
     else if ($coursenode = $settingsnav->find('courseadmin', navigation_node::TYPE_COURSE)) {
         // Link to plugin script.

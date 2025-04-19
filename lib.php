@@ -12,8 +12,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use mod_quiz\quiz_settings;
-
 /**
  * Library file for plugin 'local_quizessaygrader'.
  *
@@ -21,6 +19,8 @@ use mod_quiz\quiz_settings;
  * @copyright   2025 Alex Orlov <snickser@gmail.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_quiz\quiz_settings;
 
 defined('MOODLE_INTERNAL') || die();
 

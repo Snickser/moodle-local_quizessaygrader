@@ -104,8 +104,8 @@ function quiz_has_essay_questions($quizid) {
 
     $sql = "SELECT COUNT(q.id)
             FROM {quiz_slots} qs
-            JOIN {question_references} qr ON qr.itemid = qs.id 
-                AND qr.component = 'mod_quiz' 
+            JOIN {question_references} qr ON qr.itemid = qs.id
+                AND qr.component = 'mod_quiz'
                 AND qr.questionarea = 'slot'
             JOIN {question_bank_entries} qbe ON qbe.id = qr.questionbankentryid
             JOIN {question_versions} qv ON qv.questionbankentryid = qbe.id
@@ -226,10 +226,17 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
                 prev($userattempts);
                 $prevattempt = current($userattempts); // The previous attempt.
 
-                log_message("      Transferring grades from attempt #{$prevattempt->attempt} to attempt #{$lastattempt->attempt}", $options['verbose']);
+                log_message("      Transferring grades from attempt #{$prevattempt->attempt}" .
+                " to attempt #{$lastattempt->attempt}", $options['verbose']);
 
                 try {
-                    $count = essaygrader_transfer_grades($prevattempt->id, $lastattempt->id, $options['verbose'], $options['dryrun'], $gradetype);
+                    $count = essaygrader_transfer_grades(
+                        $prevattempt->id,
+                        $lastattempt->id,
+                        $options['verbose'],
+                        $options['dryrun'],
+                        $gradetype
+                    );
                     if ($count > 0) {
                         $processedusers++;
                         log_message("      Successfully transferred grades: {$count}", $options['verbose']);

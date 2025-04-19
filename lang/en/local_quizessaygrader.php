@@ -38,6 +38,6 @@ $string['gradetype_desc'] = 'Specifies which grade to copy, only the maximum gra
 $string['menumode'] = 'Enable menu mode';
 $string['pluginmenutitle'] = 'Quiz Essay Grade Copy Tool';
 $string['pluginname'] = 'Quiz Essay Grade Copy Tool';
-$string['pluginname_help'] = 'A plugin that makes teachers jobs easier automatically carries over students successful essay grades to assignments from the previous attempt. You can manually enable a scheduled task to run or use automatic "event" mode, or manual "menu" mode.';
+$string['pluginname_help'] = 'A plugin that makes teachers jobs easier, automatically transfers grades of students successful essays to assignments from the previous attempt. You can manually enable a scheduled task to run, or use the automatic "event" mode or the manual "menu" mode.';
 $string['transferessaygrades'] = 'Transfer Essay Grades';
 $string['verbose'] = 'Verbose output';

@@ -104,8 +104,8 @@ function quiz_has_essay_questions($quizid) {
 
     $sql = "SELECT COUNT(q.id)
             FROM {quiz_slots} qs
-            JOIN {question_references} qr ON qr.itemid = qs.id 
-                AND qr.component = 'mod_quiz' 
+            JOIN {question_references} qr ON qr.itemid = qs.id
+                AND qr.component = 'mod_quiz'
                 AND qr.questionarea = 'slot'
             JOIN {question_bank_entries} qbe ON qbe.id = qr.questionbankentryid
             JOIN {question_versions} qv ON qv.questionbankentryid = qbe.id

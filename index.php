@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Index file for plugin 'local_quizessaygrader'.
+ *
+ * @package     local_quizessaygrader
+ * @copyright   2025 Alex Orlov <snickser@gmail.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require('../../config.php');
 
 $id = required_param('id', PARAM_INT);    // ID course.

@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_quizessaygrader\task;
-
 /**
  * Send expiry notifications task.
  *
@@ -23,6 +21,8 @@ namespace local_quizessaygrader\task;
  * @copyright 2025 Alex Orlov <snickser@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace local_quizessaygrader\task;
 
 class quizessaygrader extends \core\task\scheduled_task {
     /**

@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['defaultcomment'] = 'auto';
 $string['donate'] = '<div>Plugin version: {$a->release} ({$a->versiondisk})<br>
 You can find new versions of the plugin at <a href=https://github.com/Snickser/moodle-local_quizessaygrader>GitHub.com</a>
 <img src="https://img.shields.io/github/v/release/Snickser/moodle-local_quizessaygrader.svg"><br>

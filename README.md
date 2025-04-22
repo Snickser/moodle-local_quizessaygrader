@@ -10,7 +10,7 @@
 Plugin to make teachers work easier, automatically carries over successful student grades for essays in assignments from a previous attempt.
 
 - Can be run as CLI or (if enabled) from Moodle scheduler.
-- Can be limited to a specific course or assignment.
+- In CLI mode сan be limited to a specific course, quiz, or user.
 - Select the mode of operation in settings, test and extended output display.
 - Select grades to carry over, maximum or any grade greater than zero.
 

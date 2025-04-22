@@ -7,7 +7,7 @@
 
 -----
 
-Plugin to make teachers' work easier, automatically carries over successful student grades for essays in assignments from a previous attempt.
+Plugin to make teachers work easier, automatically carries over successful student grades for essays in assignments from a previous attempt.
 
 - Can be run as CLI or (if enabled) from Moodle scheduler.
 - Can be limited to a specific course or assignment.

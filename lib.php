@@ -83,7 +83,7 @@ function local_quizessaygrader_extend_settings_navigation(settings_navigation $s
  * @param bool $verbose Whether to output the message.
  * @param bool $force Whether to force output regardless of verbose setting.
  */
-function log_message($message, $verbose = false, $force = false) {
+function local_quizessaygrader_log_message($message, $verbose = false, $force = false) {
     if ($verbose || $force) {
         if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
             echo $message . "\n";
@@ -99,7 +99,7 @@ function log_message($message, $verbose = false, $force = false) {
  * @param int $quizid The ID of the quiz to check.
  * @return bool True if the quiz contains essay questions, false otherwise.
  */
-function quiz_has_essay_questions($quizid) {
+function local_quizessaygrader_has_essay_questions($quizid) {
     global $DB;
 
     $sql = "SELECT COUNT(q.id)
@@ -125,7 +125,7 @@ function quiz_has_essay_questions($quizid) {
  * @param bool $dryrun Whether to perform a dry run without saving changes.
  * @return int Number of grades transferred.
  */
-function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dryrun = 1) {
+function local_quizessaygrader_run($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dryrun = 1) {
     global $DB, $CFG;
 
     require_once($CFG->dirroot . '/mod/quiz/locallib.php');
@@ -152,8 +152,15 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
     $starttime = time();
     $processedusers = 0;
 
-    log_message("Processing started at " . date('Y-m-d H:i:s') .
-           ($options['dryrun'] ? " <font color=blue><b>[ TEST MODE ]</b></font>" : ""), $verbose);
+    local_quizessaygrader_log_message(get_string(
+        'log_11',
+        'local_quizessaygrader',
+        ['time' => date('Y-m-d H:i:s'),
+        'test' => ($options['dryrun'] ? get_string(
+            'log_12',
+            'local_quizessaygrader'
+        ) : "")]
+    ), $verbose);
 
     // Get the list of courses.
     $courses = $DB->get_records_select(
@@ -168,7 +175,11 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
             break;
         }
 
-        log_message("\nCourse: " . format_string($course->fullname) . " (ID: {$course->id})", $verbose);
+        local_quizessaygrader_log_message(get_string(
+            'log_10',
+            'local_quizessaygrader',
+            ['name' => format_string($course->fullname), 'id' => $course->id]
+        ), $verbose);
 
         // Get quizzes in the course.
         $quizzes = $DB->get_records_select(
@@ -182,10 +193,14 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
                 break 2;
             }
 
-            log_message("  Quiz: {$quiz->name} (ID: {$quiz->id})", $options['verbose']);
+            local_quizessaygrader_log_message(get_string(
+                'log_09',
+                'local_quizessaygrader',
+                ['name' => $quiz->name, 'id' => $quiz->id]
+            ), $options['verbose']);
 
             // Skip if quiz has no essay questions.
-            if (!quiz_has_essay_questions($quiz->id)) {
+            if (!local_quizessaygrader_has_essay_questions($quiz->id)) {
                 continue;
             }
 
@@ -219,18 +234,28 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
                 }
 
                 $user = $DB->get_record('user', ['id' => $userid], 'id, firstname, lastname');
-                log_message("    User: {$user->firstname} {$user->lastname} (ID: {$user->id})", $options['verbose']);
+                local_quizessaygrader_log_message(
+                    get_string(
+                        'log_08',
+                        'local_quizessaygrader',
+                        ['firstname' => $user->firstname, 'lastname' => $user->lastname, 'id' => $user->id]
+                    ),
+                    $options['verbose']
+                );
 
                 // Take the two most recent attempts.
                 $lastattempt = end($userattempts); // The newest attempt.
                 prev($userattempts);
                 $prevattempt = current($userattempts); // The previous attempt.
 
-                log_message("      Transferring grades from attempt #{$prevattempt->attempt}" .
-                " to attempt #{$lastattempt->attempt}", $options['verbose']);
+                local_quizessaygrader_log_message(get_string(
+                    'log_07',
+                    'local_quizessaygrader',
+                    ['prev' => $prevattempt->attempt, 'last' => $lastattempt->attempt]
+                ), $options['verbose']);
 
                 try {
-                    $count = essaygrader_transfer_grades(
+                    $count = local_quizessaygrader_transfer_grades(
                         $prevattempt->id,
                         $lastattempt->id,
                         $options['verbose'],
@@ -239,10 +264,13 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
                     );
                     if ($count > 0) {
                         $processedusers++;
-                        log_message("      Successfully transferred grades: {$count}", $options['verbose']);
+                        local_quizessaygrader_log_message(
+                            get_string('log_06', 'local_quizessaygrader', $count),
+                            $options['verbose']
+                        );
                     }
                 } catch (Exception $e) {
-                    log_message("      Error: " . $e->getMessage(), $verbose);
+                    local_quizessaygrader_log_message(get_string('log_05', 'local_quizessaygrader', $e->getMessage()), $verbose);
                     continue;
                 }
             }
@@ -252,15 +280,15 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
     // Commit or rollback changes based on dryrun setting.
     if (!$options['dryrun']) {
         $transaction->allow_commit();
-        log_message("Changes saved to database", $verbose);
+        local_quizessaygrader_log_message(get_string('log_04', 'local_quizessaygrader'), $verbose);
     } else {
         $DB->force_transaction_rollback();
-        log_message("Transaction rolled back [test mode]", $verbose);
+        local_quizessaygrader_log_message(get_string('log_03', 'local_quizessaygrader'), $verbose);
     }
 
     $totaltime = time() - $starttime;
-    log_message("\nProcessing completed in {$totaltime} seconds", $verbose);
-    log_message("Total users processed: {$processedusers}", $verbose);
+    local_quizessaygrader_log_message(get_string('log_02', 'local_quizessaygrader', $totaltime), $verbose);
+    local_quizessaygrader_log_message(get_string('log_01', 'local_quizessaygrader', $processedusers), $verbose);
 
     return $count;
 }
@@ -276,7 +304,7 @@ function essaygrader($courseid = 0, $quizid = 0, $userid = 0, $verbose = 0, $dry
  * @return int Number of grades transferred.
  * @throws moodle_exception If grade transfer fails.
  */
-function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbose = false, $dryrun = false, $gradetype = 0) {
+function local_quizessaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbose = false, $dryrun = false, $gradetype = 0) {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/mod/quiz/locallib.php');
     require_once($CFG->libdir . '/gradelib.php');
@@ -322,12 +350,20 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
                         $maxgrade = $actualgrade;
                     }
                     if (is_null($grade) || $actualgrade <= 0 || $actualgrade < $maxgrade) {
-                        log_message("        Essay (slot {$slot->slot}): grade $actualgrade (not transferred)", $verbose);
+                        local_quizessaygrader_log_message(get_string(
+                            'log_18',
+                            'local_quizessaygrader',
+                            ['slot' => $slot->slot, 'grade' => $actualgrade]
+                        ), $verbose);
                         continue;
                     }
                     if (!is_null($targetgrade) && $targetgrade) {
                         $skippedalreadygraded++;
-                        log_message("        Essay (slot {$slot->slot}): skipped (grade already exists)", $verbose);
+                        local_quizessaygrader_log_message(get_string(
+                            'log_17',
+                            'local_quizessaygrader',
+                            $slot->slot
+                        ), $verbose);
                         continue;
                     }
 
@@ -349,11 +385,22 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
                         $count++;
                     }
 
-                    log_message("        <b>Essay (slot {$slot->slot}): transferred {$actualgrade}/{$maxmark}</b>" .
-                        ($dryrun ? " [test mode]" : ""), $verbose);
+                    local_quizessaygrader_log_message(get_string(
+                        'log_16',
+                        'local_quizessaygrader',
+                        ['slot' => $slot->slot, 'grade' => $actualgrade, 'max' => $maxmark,
+                        'test' => ($dryrun ? get_string(
+                            'log_14',
+                            'local_quizessaygrader'
+                        ) : "")]
+                    ), $verbose);
                 }
             } catch (Exception $e) {
-                log_message("        Slot {$slot->slot} error: " . $e->getMessage(), $verbose);
+                local_quizessaygrader_log_message(get_string(
+                    'log_15',
+                    'local_quizessaygrader',
+                    ['slot' => $slot->slot, 'error' => $e->getMessage()]
+                ), $verbose);
                 continue;
             }
         }
@@ -367,14 +414,19 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
             $DB->update_record('quiz_attempts', $targetattempt);
         }
 
-        log_message("      Summary: essay questions: {$totalessays}, " .
-            "transferred: {$count}, " .
-            "skipped (grade exists): {$skippedalreadygraded}" .
-            ($dryrun ? " [test mode]" : ""), $verbose);
+        local_quizessaygrader_log_message(get_string(
+            'log_13',
+            'local_quizessaygrader',
+            ['total' => $totalessays, 'count' => $count, 'skip' => $skippedalreadygraded,
+            'test' => ($dryrun ? get_string(
+                'log_14',
+                'local_quizessaygrader'
+            ) : "")]
+        ), $verbose);
 
         return $count;
     } catch (Exception $e) {
-        throw new moodle_exception('transferfailed', 'error', '', null, $e->getMessage());
+        throw new moodle_exception('transferfailed', 'local_quizessaygrader', '', null, $e->getMessage());
     }
 }
 
@@ -384,7 +436,7 @@ function essaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbos
  * @param \mod_quiz\event\attempt_submitted $event The quiz attempt submitted event.
  * @return int Number of grades transferred.
  */
-function essaygrader_attempt_submitted(\mod_quiz\event\attempt_submitted $event) {
+function local_quizessaygrader_attempt_submitted(\mod_quiz\event\attempt_submitted $event) {
     global $DB, $CFG;
 
     // Get event data.
@@ -392,7 +444,7 @@ function essaygrader_attempt_submitted(\mod_quiz\event\attempt_submitted $event)
 
     // Execute if event processing is enabled.
     if (get_config('local_quizessaygrader', 'event')) {
-        $count = essaygrader($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);
+        $count = local_quizessaygrader_run($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);
     }
 
     return $count;

@@ -63,7 +63,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'local_quizessaygrader'));
 
 // Execute.
-essaygrader($id, $qid, 0, $verbose, $dryrun);
+local_quizessaygrader_run($id, $qid, 0, $verbose, $dryrun);
 
 echo '<hr>';
 

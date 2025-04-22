@@ -12,7 +12,7 @@ Plugin to make teachers' work easier, automatically carries over successful stud
 - Can be run as CLI or (if enabled) from Moodle scheduler.
 - Can be limited to a specific course or assignment.
 - Select the mode of operation in settings, test and extended output display.
-- Select grades to carry over, maximum score or any score greater than zero.
+- Select grades to carry over, maximum or any grade greater than zero.
 
 ![изображение](https://github.com/user-attachments/assets/fb87d08c-0ba1-45ea-a8d8-2d9de1510fb6)
 

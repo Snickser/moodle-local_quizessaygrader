@@ -59,7 +59,7 @@ php transfer_essay_grades.php --source=123 --target=456
 }
 
 try {
-    $count = essaygrader_transfer_grades(
+    $count = local_quizessaygrader_transfer_grades(
         $options['source'],
         $options['target'],
         $options['verbose'],

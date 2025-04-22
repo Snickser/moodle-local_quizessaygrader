@@ -62,7 +62,7 @@ class quizessaygrader extends \core\task\scheduled_task {
         $dryrun = get_config('local_quizessaygrader', 'dryrun');
 
         // Process essay questions and get count of processed items.
-        $count = essaygrader(0, 0, 0, $verbose, $dryrun);
+        $count = local_quizessaygrader_run(0, 0, 0, $verbose, $dryrun);
 
         // Output processing statistics.
         mtrace("Processed: $count");

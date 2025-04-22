@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 $observers = [
     [
         'eventname' => '\mod_quiz\event\attempt_submitted',
-        'callback' => 'essaygrader_attempt_submitted',
+        'callback' => 'local_quizessaygrader_attempt_submitted',
         'includefile' => '/local/quizessaygrader/lib.php',
     ],
 ];

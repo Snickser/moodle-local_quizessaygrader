@@ -32,12 +32,18 @@ ETH 0x1bce7aadef39d328d262569e6194febe597cb2c9<br>
 <iframe src="https://yoomoney.ru/quickpay/fundraise/button?billNumber=143H2JO3LLE.240720"
 width="330" height="50" frameborder="0" allowtransparency="true" scrolling="no"></iframe>';
 $string['dryrun'] = 'Test mode';
+$string['dryrun_desc'] = 'Affects the scheduled task, in this mode only a report is displayed (if enabled), no grade transfer is performed.';
 $string['eventmode'] = 'Enable event mode';
+$string['eventmode_desc'] = 'In this mode, grades are processed immediately after the student submits their work. Preferred mode.';
 $string['gradetype'] = 'Grade type';
 $string['gradetype_desc'] = 'Specifies which grade to copy, only the maximum grade or any grade greater than zero.';
 $string['menumode'] = 'Enable menu mode';
+$string['menumode_desc'] = 'Adds a link to manual processing of grades to the course and quiz menu.';
 $string['pluginmenutitle'] = 'Quiz Essay Grade Copy Tool';
 $string['pluginname'] = 'Quiz Essay Grade Copy Tool';
-$string['pluginname_help'] = 'A plugin that makes teachers jobs easier, automatically transfers grades of students successful essays to assignments from the previous attempt. You can manually enable a scheduled task to run, or use the automatic "event" mode or the manual "menu" mode.';
+$string['pluginname_help'] = 'A plugin that makes teachers jobs easier automatically carries over students successful essay grades to assignments from the previous attempt. You can manually enable a scheduled task to run or use automatic "event" mode, or manual "menu" mode.';
+$string['privacy:metadata'] = 'The quizessaygrader local plugin does not store any personal data.';
 $string['transferessaygrades'] = 'Transfer Essay Grades';
-$string['verbose'] = 'Verbose output';
+$string['transferfailed'] = 'An error occurred during execution';
+$string['verbose'] = 'More verbose output';
+$string['verbose_desc'] = 'Extended information about the work results is displayed in sheduled and menu mode.';

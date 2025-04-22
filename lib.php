@@ -368,7 +368,7 @@ function local_quizessaygrader_transfer_grades($sourceattemptid, $targetattempti
                     }
 
                     // Get feedback from last step.
-                    $feedback = 'auto';
+                    $feedback = get_string('defaultcomment', 'local_quizessaygrader');
                     $laststep = $sourceqa->get_last_step();
                     if ($laststep->has_behaviour_var('comment')) {
                         $text = $laststep->get_behaviour_var('comment');

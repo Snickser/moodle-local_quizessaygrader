@@ -62,28 +62,28 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configcheckbox(
         'local_quizessaygrader/dryrun',
         get_string('dryrun', 'local_quizessaygrader'),
-        '',
-        1
-    ));
-
-    $settings->add(new admin_setting_configcheckbox(
-        'local_quizessaygrader/verbose',
-        get_string('verbose', 'local_quizessaygrader'),
-        '',
-        0
-    ));
-
-    $settings->add(new admin_setting_configcheckbox(
-        'local_quizessaygrader/event',
-        get_string('eventmode', 'local_quizessaygrader'),
-        '',
+        get_string('dryrun_desc', 'local_quizessaygrader'),
         1
     ));
 
     $settings->add(new admin_setting_configcheckbox(
         'local_quizessaygrader/menu',
         get_string('menumode', 'local_quizessaygrader'),
-        '',
+        get_string('menumode_desc', 'local_quizessaygrader'),
         0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_quizessaygrader/verbose',
+        get_string('verbose', 'local_quizessaygrader'),
+        get_string('verbose_desc', 'local_quizessaygrader'),
+        0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_quizessaygrader/event',
+        get_string('eventmode', 'local_quizessaygrader'),
+        get_string('eventmode_desc', 'local_quizessaygrader'),
+        1
     ));
 }

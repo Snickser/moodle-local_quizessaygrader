@@ -14,5 +14,6 @@ Plugin to make teachers work easier, automatically carries over successful stude
 - Select the mode of operation in settings, test and extended output display.
 - Select grades to carry over, maximum or any grade greater than zero.
 
-![изображение](https://github.com/user-attachments/assets/fb87d08c-0ba1-45ea-a8d8-2d9de1510fb6)
+![изображение](https://github.com/user-attachments/assets/ea88c230-e508-41e3-bdc5-8500d6717603)
+
 

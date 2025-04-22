@@ -304,7 +304,13 @@ function local_quizessaygrader_run($courseid = 0, $quizid = 0, $userid = 0, $ver
  * @return int Number of grades transferred.
  * @throws moodle_exception If grade transfer fails.
  */
-function local_quizessaygrader_transfer_grades($sourceattemptid, $targetattemptid, $verbose = false, $dryrun = false, $gradetype = 0) {
+function local_quizessaygrader_transfer_grades(
+    $sourceattemptid,
+    $targetattemptid,
+    $verbose = false,
+    $dryrun = false,
+    $gradetype = 0
+) {
     global $DB, $CFG;
     require_once($CFG->dirroot . '/mod/quiz/locallib.php');
     require_once($CFG->libdir . '/gradelib.php');
@@ -444,7 +450,13 @@ function local_quizessaygrader_attempt_submitted(\mod_quiz\event\attempt_submitt
 
     // Execute if event processing is enabled.
     if (get_config('local_quizessaygrader', 'event')) {
-        $count = local_quizessaygrader_run($eventdata['courseid'], $eventdata['other']['quizid'], $eventdata['userid'], false, false);
+        $count = local_quizessaygrader_run(
+            $eventdata['courseid'],
+            $eventdata['other']['quizid'],
+            $eventdata['userid'],
+            false,
+            false
+        );
     }
 
     return $count;

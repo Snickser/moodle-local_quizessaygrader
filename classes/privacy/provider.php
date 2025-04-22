@@ -17,9 +17,9 @@
 /**
  * Privacy provider implementation for local_quizessaygrader.
  *
- * @package    local_quizessaygrader
- * @copyright  2025 Alex Orlov <snickser@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   local_quizessaygrader
+ * @copyright 2025 Alex Orlov <snickser@gmail.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_quizessaygrader\privacy;
